@@ -1,0 +1,16 @@
+{
+  "name": "terra",
+  "version": "1.0.0",
+  "description": "A physical AI warehouse robot: camera and lidar perception, a Claude vision-language-action brain or a classical planner, and a safety shield between the brain and the motors.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Casimir Terrence",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "bench": "node bench/run.js",
+    "test:web": "node test/web/check_web.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0"
+  }
+}

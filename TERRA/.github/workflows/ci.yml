@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  sim:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["18", "20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Unit tests
+        run: npm test
+      - name: Benchmark matches the committed results
+        if: matrix.node-version == '22'
+        run: |
+          node bench/run.js --seeds 20 --out /tmp/bench.json
+          node -e "const a=require('/tmp/bench.json').table, b=require('./results/bench.json').table; if (JSON.stringify(a)!==JSON.stringify(b)) { console.error('results/bench.json is stale: run node bench/run.js'); process.exit(1) }"
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Browser checks
+        run: npm run test:web
